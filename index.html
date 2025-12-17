@@ -249,8 +249,8 @@
                 var eq = data[i];
 
                 let equipmentId = eq.equipmentId;
-                let serialNumber = equipmentId.split('|')[0] || ''; //시리얼 넘버
-                let batteryType = equipmentId.split('|')[1] || ''; //배터리 용량
+                let serialNumber = eq.serialNumber; //시리얼 넘버
+                let batteryType = eq.batteryType; //배터리 용량
 
                 var config = statusConfig[eq.status] || { color: 'bg-gray-100 text-gray-800 border-gray-300', icon: '?' };
 
