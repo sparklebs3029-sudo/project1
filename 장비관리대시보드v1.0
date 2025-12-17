@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>장비 관리 대시보드</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen p-6">
+    <div class="max-w-7xl mx-auto">
+        <div class="mb-8">
+            <div class="flex justify-between items-center mb-2">
+                <h1 class="text-4xl font-bold text-slate-800">장비 관리 대시보드</h1>
+                <div class="flex gap-2">
+                    <button onclick="showSettings()" class="px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700">
+                        설정
+                    </button>
+                    <button onclick="refreshData()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                        새로고침
+                    </button>
+                </div>
+            </div>
+            <p id="lastUpdate" class="text-sm text-slate-500"></p>
+        </div>
+
+        <div id="settingsPanel" class="mb-6 bg-white rounded-xl shadow-lg p-6 border-2 border-blue-300 hidden">
+            <h2 class="text-xl font-semibold mb-4">설정</h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">Apps Script URL</label>
+                    <input type="text" id="apiUrl" placeholder="https://script.google.com/macros/s/.../exec"
+                           class="w-full px-4 py-3 border-2 border-slate-300 rounded-lg">
+                </div>
+                
+                <div class="p-3 bg-slate-50 rounded-lg">
+                    <label class="flex items-center gap-2 cursor-pointer mb-2">
+                        <input type="checkbox" id="autoRefresh" class="w-4 h-4">
+                        <span class="text-sm font-medium">자동 새로고침</span>
+                    </label>
+                    
+                    <div id="intervalSettings" class="flex items-center gap-2 mt-2 hidden">
+                        <label class="text-sm">간격(초):</label>
+                        <input type="number" id="refreshInterval" value="30" min="10" max="300"
+                               class="w-20 px-2 py-1 border rounded">
+                    </div>
+                </div>
+                
+                <button onclick="saveSettings()" class="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold">
+                    설정 저장
+                </button>
+            </div>
+        </div>
+
+        <div id="errorMessage" class="mb-6 p-4 bg-red-50 border-2 border-red-200 rounded-lg text-red-700 hidden"></div>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-yellow-100 text-yellow-800 border-2 border-yellow-300 rounded-xl p-6 shadow-sm">
+                <div class="flex items-center justify-between mb-2">
+                    <span>!</span>
+                    <span id="count-request" class="text-3xl font-bold">0</span>
+                </div>
+                <p class="font-medium text-sm">수리입고 의뢰</p>
+            </div>
+
+            <div class="bg-orange-100 text-orange-800 border-2 border-orange-300 rounded-xl p-6 shadow-sm">
+                <div class="flex items-center justify-between mb-2">
+                    <span>*</span>
+                    <span id="count-complete" class="text-3xl font-bold">0</span>
+                </div>
+                <p class="font-medium text-sm">수리입고 완료</p>
+            </div>
+
+            <div class="bg-blue-100 text-blue-800 border-2 border-blue-300 rounded-xl p-6 shadow-sm">
+                <div class="flex items-center justify-between mb-2">
+                    <span>+</span>
+                    <span id="count-release" class="text-3xl font-bold">0</span>
+                </div>
+                <p class="font-medium text-sm">수리완료 출고</p>
+            </div>
+
+            <div class="bg-green-100 text-green-800 border-2 border-green-300 rounded-xl p-6 shadow-sm">
+                <div class="flex items-center justify-between mb-2">
+                    <span>v</span>
+                    <span id="count-inuse" class="text-3xl font-bold">0</span>
+                </div>
+                <p class="font-medium text-sm">사용중</p>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="px-6 py-4 bg-slate-800 text-white">
+                <h2 class="text-xl font-semibold">전체 장비 현황 (<span id="totalCount">0</span>대)</h2>
+            </div>
+
+            <div id="loadingMessage" class="p-12 text-center text-slate-500">
+                <p class="text-lg mb-2">설정 버튼을 눌러 Apps Script URL을 입력하세요</p>
+            </div>
+
+            <div id="tableContainer" class="overflow-x-auto hidden">
+                <table class="w-full">
+                    <thead class="bg-slate-50 border-b-2 border-slate-200">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-slate-700">장비 번호</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-slate-700">현재 상태</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-slate-700">최종 보고자</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-slate-700">최종 업데이트</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-slate-700">세부 정보</th>
+                            <th class="px-6 py-3 text-center text-sm font-semibold text-slate-700">이력 수</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var refreshTimer = null;
+
+        var statusConfig = {
+            '수리입고 의뢰': { color: 'bg-yellow-100 text-yellow-800 border-yellow-300', icon: '!' },
+            '수리입고 완료': { color: 'bg-orange-100 text-orange-800 border-orange-300', icon: '*' },
+            '수리완료 출고': { color: 'bg-blue-100 text-blue-800 border-blue-300', icon: '+' },
+            '사용중': { color: 'bg-green-100 text-green-800 border-green-300', icon: 'v' }
+        };
+
+        function loadSettings() {
+            var url = localStorage.getItem('equipmentApiUrl');
+            var autoRefresh = localStorage.getItem('equipmentAutoRefresh') === 'true';
+            var interval = localStorage.getItem('equipmentRefreshInterval') || '30';
+
+            if (url) {
+                document.getElementById('apiUrl').value = url;
+                refreshData();
+            }
+
+            document.getElementById('autoRefresh').checked = autoRefresh;
+            document.getElementById('refreshInterval').value = interval;
+
+            if (autoRefresh) {
+                document.getElementById('intervalSettings').classList.remove('hidden');
+                startAutoRefresh();
+            }
+        }
+
+        function showSettings() {
+            var panel = document.getElementById('settingsPanel');
+            panel.classList.toggle('hidden');
+        }
+
+        function saveSettings() {
+            var url = document.getElementById('apiUrl').value.trim();
+            var autoRefresh = document.getElementById('autoRefresh').checked;
+            var interval = document.getElementById('refreshInterval').value;
+
+            if (!url) {
+                alert('URL을 입력하세요!');
+                return;
+            }
+
+            localStorage.setItem('equipmentApiUrl', url);
+            localStorage.setItem('equipmentAutoRefresh', autoRefresh);
+            localStorage.setItem('equipmentRefreshInterval', interval);
+
+            alert('설정이 저장되었습니다!');
+            document.getElementById('settingsPanel').classList.add('hidden');
+
+            if (autoRefresh) {
+                startAutoRefresh();
+            } else {
+                stopAutoRefresh();
+            }
+
+            refreshData();
+        }
+
+        function refreshData() {
+            var url = document.getElementById('apiUrl').value.trim() || localStorage.getItem('equipmentApiUrl');
+
+            if (!url) {
+                showError('Apps Script URL을 설정하세요!');
+                return;
+            }
+
+            hideError();
+
+            fetch(url)
+                .then(function(response) {
+                    if (!response.ok) {
+                        throw new Error('데이터를 가져올 수 없습니다. URL을 확인하세요.');
+                    }
+                    return response.json();
+                })
+                .then(function(result) {
+                    if (result.success && result.data) {
+                        updateDashboard(result.data);
+                        document.getElementById('lastUpdate').textContent = '마지막 업데이트: ' + new Date().toLocaleString('ko-KR');
+                    } else {
+                        throw new Error('데이터 형식이 올바르지 않습니다.');
+                    }
+                })
+                .catch(function(error) {
+                    showError('오류: ' + error.message);
+                });
+        }
+
+        function updateDashboard(data) {
+            document.getElementById('loadingMessage').classList.add('hidden');
+            document.getElementById('tableContainer').classList.remove('hidden');
+
+            var summary = {
+                '수리입고 의뢰': 0,
+                '수리입고 완료': 0,
+                '수리완료 출고': 0,
+                '사용중': 0
+            };
+
+            for (var i = 0; i < data.length; i++) {
+                var eq = data[i];
+                if (summary.hasOwnProperty(eq.status)) {
+                    summary[eq.status]++;
+                }
+            }
+
+            document.getElementById('count-request').textContent = summary['수리입고 의뢰'];
+            document.getElementById('count-complete').textContent = summary['수리입고 완료'];
+            document.getElementById('count-release').textContent = summary['수리완료 출고'];
+            document.getElementById('count-inuse').textContent = summary['사용중'];
+            document.getElementById('totalCount').textContent = data.length;
+
+            var tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            for (var i = 0; i < data.length; i++) {
+                var eq = data[i];
+                var config = statusConfig[eq.status] || { color: 'bg-gray-100 text-gray-800 border-gray-300', icon: '?' };
+
+                var row = document.createElement('tr');
+                row.className = 'hover:bg-slate-50 transition-colors';
+                row.innerHTML = '<td class="px-6 py-4 font-medium">' + eq.equipmentId + '</td>' +
+                    '<td class="px-6 py-4">' +
+                    '<span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium border ' + config.color + '">' +
+                    config.icon + ' ' + eq.status +
+                    '</span>' +
+                    '</td>' +
+                    '<td class="px-6 py-4">' + eq.reporter + '</td>' +
+                    '<td class="px-6 py-4 text-sm text-slate-600">' + eq.timestamp + '</td>' +
+                    '<td class="px-6 py-4 text-sm">' + eq.details + '</td>' +
+                    '<td class="px-6 py-4 text-center">' +
+                    '<span class="inline-flex items-center justify-center w-8 h-8 bg-slate-100 rounded-full text-sm font-semibold">' +
+                    eq.historyCount +
+                    '</span>' +
+                    '</td>';
+                tbody.appendChild(row);
+            }
+        }
+
+        function showError(message) {
+            var errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.classList.remove('hidden');
+        }
+
+        function hideError() {
+            document.getElementById('errorMessage').classList.add('hidden');
+        }
+
+        function startAutoRefresh() {
+            stopAutoRefresh();
+            var interval = parseInt(document.getElementById('refreshInterval').value) * 1000;
+            refreshTimer = setInterval(refreshData, interval);
+        }
+
+        function stopAutoRefresh() {
+            if (refreshTimer) {
+                clearInterval(refreshTimer);
+                refreshTimer = null;
+            }
+        }
+
+        document.getElementById('autoRefresh').addEventListener('change', function(e) {
+            var intervalSettings = document.getElementById('intervalSettings');
+            if (e.target.checked) {
+                intervalSettings.classList.remove('hidden');
+            } else {
+                intervalSettings.classList.add('hidden');
+            }
+        });
+
+        window.addEventListener('load', loadSettings);
+    </script>
+</body>
+</html>
