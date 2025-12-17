@@ -109,7 +109,8 @@
                 <table class="w-full">
                     <thead class="bg-slate-50 border-b-2 border-slate-200">
                         <tr>
-                            <th class="px-6 py-3 text-left text-sm font-semibold text-slate-700">장비 번호</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-slate-700">Serial NO</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-slate-700">배터리 용량</th>
                             <th class="px-6 py-3 text-left text-sm font-semibold text-slate-700">현재 상태</th>
                             <th class="px-6 py-3 text-left text-sm font-semibold text-slate-700">최종 보고자</th>
                             <th class="px-6 py-3 text-left text-sm font-semibold text-slate-700">최종 업데이트</th>
@@ -228,6 +229,7 @@
 
             for (var i = 0; i < data.length; i++) {
                 var eq = data[i];
+                console.log(eq);
                 if (summary.hasOwnProperty(eq.status)) {
                     summary[eq.status]++;
                 }
@@ -245,11 +247,19 @@
 
             for (var i = 0; i < data.length; i++) {
                 var eq = data[i];
+
+                let equipmentId = eq.equipmentId;
+                let serialNumber = equipmentId.split('|')[0] || ''; //시리얼 넘버
+                let batteryType = equipmentId.split('|')[1] || ''; //배터리 용량
+
                 var config = statusConfig[eq.status] || { color: 'bg-gray-100 text-gray-800 border-gray-300', icon: '?' };
 
                 var row = document.createElement('tr');
                 row.className = 'hover:bg-slate-50 transition-colors';
-                row.innerHTML = '<td class="px-6 py-4 font-medium">' + eq.equipmentId + '</td>' +
+                row.innerHTML = '';
+                row.innerHTML += '<td class="px-6 py-4 font-medium">' + serialNumber + '</td>';
+                row.innerHTML += '<td class="px-6 py-4 font-medium">' + batteryType + '</td>';
+                row.innerHTML +=
                     '<td class="px-6 py-4">' +
                     '<span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium border ' + config.color + '">' +
                     config.icon + ' ' + eq.status +
