@@ -54,7 +54,7 @@
 
         <div id="errorMessage" class="mb-6 p-4 bg-red-50 border-2 border-red-200 rounded-lg text-red-700 hidden"></div>
 
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
             <div class="bg-yellow-100 text-yellow-800 border-2 border-yellow-300 rounded-xl p-6 shadow-sm">
                 <div class="flex items-center justify-between mb-2">
                     <span>!</span>
@@ -86,10 +86,11 @@
                 </div>
                 <p class="font-medium text-sm">사용중</p>
             </div>
-            <div class="bg-green-100 text-green-800 border-2 border-green-300 rounded-xl p-6 shadow-sm">
+
+            <div class="bg-purple-100 text-purple-800 border-2 border-purple-300 rounded-xl p-6 shadow-sm">
                 <div class="flex items-center justify-between mb-2">
-                    <span>v</span>
-                    <span id="count-inuse" class="text-3xl font-bold">0</span>
+                    <span>◆</span>
+                    <span id="count-stock" class="text-3xl font-bold">0</span>
                 </div>
                 <p class="font-medium text-sm">재고</p>
             </div>
@@ -129,7 +130,8 @@
             '수리입고 의뢰': { color: 'bg-yellow-100 text-yellow-800 border-yellow-300', icon: '!' },
             '수리입고 완료': { color: 'bg-orange-100 text-orange-800 border-orange-300', icon: '*' },
             '수리완료 출고': { color: 'bg-blue-100 text-blue-800 border-blue-300', icon: '+' },
-            '사용중': { color: 'bg-green-100 text-green-800 border-green-300', icon: 'v' }
+            '사용중': { color: 'bg-green-100 text-green-800 border-green-300', icon: 'v' },
+            '재고': { color: 'bg-purple-100 text-purple-800 border-purple-300', icon: '◆' }
         };
 
         function loadSettings() {
@@ -221,7 +223,7 @@
                 '수리입고 완료': 0,
                 '수리완료 출고': 0,
                 '사용중': 0,
-                '재고' : 0
+                '재고': 0
             };
 
             for (var i = 0; i < data.length; i++) {
@@ -235,7 +237,7 @@
             document.getElementById('count-complete').textContent = summary['수리입고 완료'];
             document.getElementById('count-release').textContent = summary['수리완료 출고'];
             document.getElementById('count-inuse').textContent = summary['사용중'];
-            document.getElementById('count-inuse').textContent = summary['재고'];
+            document.getElementById('count-stock').textContent = summary['재고'];
             document.getElementById('totalCount').textContent = data.length;
 
             var tbody = document.getElementById('tableBody');
