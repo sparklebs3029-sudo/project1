@@ -115,7 +115,7 @@
                             <th class="px-6 py-3 text-left text-sm font-semibold text-slate-700">최종 보고자</th>
                             <th class="px-6 py-3 text-left text-sm font-semibold text-slate-700">최종 업데이트</th>
                             <th class="px-6 py-3 text-left text-sm font-semibold text-slate-700">세부 정보</th>
-                            <th class="px-6 py-3 text-center text-sm font-semibold text-slate-700">E2 값</th>
+                            <th class="px-6 py-3 text-center text-sm font-semibold text-slate-700">관리상태</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody"></tbody>
@@ -270,7 +270,7 @@
                     '<td class="px-6 py-4 text-sm">' + eq.details + '</td>' +
                     '<td class="px-6 py-4 text-center">' +
                     '<span class="inline-flex items-center justify-center w-8 h-8 bg-slate-100 rounded-full text-sm font-semibold">' +
-                    (eq.e2Value || '-') +
+                    (eq.e2Value || '미지정') +
                     '</span>' +
                     '</td>';
                 tbody.appendChild(row);
