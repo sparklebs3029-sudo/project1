@@ -92,7 +92,7 @@
                     <span>📦</span>
                     <span id="count-stock" class="text-3xl font-bold">0</span>
                 </div>
-                <p class="font-medium text-sm">재고</p>
+                <p class="font-medium text-sm">보유</p>
             </div>
         </div>
 
@@ -132,7 +132,7 @@
             '수리입고 완료': { color: 'bg-orange-100 text-orange-800 border-orange-300', icon: '*' },
             '수리완료 출고': { color: 'bg-blue-100 text-blue-800 border-blue-300', icon: '+' },
             '사용중': { color: 'bg-green-100 text-green-800 border-green-300', icon: 'v' },
-            '재고': { color: 'bg-purple-100 text-purple-800 border-purple-300', icon: '📦' }
+            '보유': { color: 'bg-purple-100 text-purple-800 border-purple-300', icon: '📦' }
         };
 
         function loadSettings() {
@@ -224,7 +224,7 @@
                 '수리입고 완료': 0,
                 '수리완료 출고': 0,
                 '사용중': 0,
-                '재고': 0
+                '보유': 0
             };
 
             for (var i = 0; i < data.length; i++) {
@@ -239,7 +239,7 @@
             document.getElementById('count-complete').textContent = summary['수리입고 완료'];
             document.getElementById('count-release').textContent = summary['수리완료 출고'];
             document.getElementById('count-inuse').textContent = summary['사용중'];
-            document.getElementById('count-stock').textContent = summary['재고'];
+            document.getElementById('count-stock').textContent = summary['보유'];
             document.getElementById('totalCount').textContent = data.length;
 
             var tbody = document.getElementById('tableBody');
