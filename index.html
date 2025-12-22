@@ -263,6 +263,39 @@
                 var key = sortedBatteries[i];
                 var summaryDiv = document.createElement('div');
                 summaryDiv.className = 'bg-gradient-to-r from-blue-50 to-slate-50 border-2 border-blue-200 px-5 py-3 rounded-lg';
+                
+                var keySpan = document.createElement('span');
+                keySpan.className = 'text-sm font-bold text-blue-900';
+                keySpan.textContent = key;
+                
+                var labelSpan = document.createElement('span');
+                labelSpan.className = 'text-slate-500';
+                labelSpan.textContent = ' 총 수량 ';
+                
+                var countSpan = document.createElement('span');
+                countSpan.className = 'text-2xl font-bold text-blue-600';
+                countSpan.textContent = batterySummary[key];
+                
+                var unitSpan = document.createElement('span');
+                unitSpan.className = 'text-sm text-slate-500';
+                unitSpan.textContent = '개';
+                
+                summaryDiv.appendChild(keySpan);
+                summaryDiv.appendChild(labelSpan);
+                summaryDiv.appendChild(countSpan);
+                summaryDiv.appendChild(unitSpan);
+                
+                batteryContainer.appendChild(summaryDiv);
+            }
+            // 배터리 요약 UI 생성
+            var batteryContainer = document.getElementById('batterySummary');
+            batteryContainer.innerHTML = '';
+            
+            var sortedBatteries = Object.keys(batterySummary).sort();
+            for (var i = 0; i < sortedBatteries.length; i++) {
+                var key = sortedBatteries[i];
+                var summaryDiv = document.createElement('div');
+                summaryDiv.className = 'bg-gradient-to-r from-blue-50 to-slate-50 border-2 border-blue-200 px-5 py-3 rounded-lg';
                 summaryDiv.innerHTML = '<span class="text-sm font-bold text-blue-900">' + key + '</span>' +
                     ' <span class="text-slate-500">총 수량</span> ' +
                     '<span class="text-2xl font-bold text-blue-600">' + batterySummary[key] + '</span>' +
