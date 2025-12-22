@@ -241,7 +241,28 @@
             document.getElementById('count-inuse').textContent = summary['사용중'];
             document.getElementById('count-stock').textContent = summary['보유'];
             document.getElementById('totalCount').textContent = data.length;
+            // 배터리 용량별 집계
+            var batterySummary = {};
+            for (var i = 0; i < data.length; i++) {
+                var batteryType = data[i].batteryType || '알수없음';
+                batterySummary[batteryType] = (batterySummary[batteryType] || 0) + 1;
+            }
 
+            // 배터리 요약 UI 생성
+            var batteryContainer = document.getElementById('batterySummary');
+            batteryContainer.innerHTML = '';
+            
+            var sortedBatteries = Object.keys(batterySummary).sort();
+            for (var i = 0; i < sortedBatteries.length; i++) {
+                var key = sortedBatteries[i];
+                var summaryDiv = document.createElement('div');
+                summaryDiv.className = 'bg-gradient-to-r from-blue-50 to-slate-50 border-2 border-blue-200 px-5 py-3 rounded-lg';
+                summaryDiv.innerHTML = '<span class="text-sm font-bold text-blue-900">' + key + '</span>' +
+                    ' <span class="text-slate-500">총 수량</span> ' +
+                    '<span class="text-2xl font-bold text-blue-600">' + batterySummary[key] + '</span>' +
+                    '<span class="text-sm text-slate-500">개</span>';
+                batteryContainer.appendChild(summaryDiv);
+            }
             var tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
 
