@@ -268,9 +268,6 @@
                 keySpan.className = 'text-base font-bold text-blue-900';
                 keySpan.textContent = key;
                 
-                var labelSpan = document.createElement('span');
-                labelSpan.className = 'text-base text-slate-500';
-                labelSpan.textContent = ' 총 수량 ';
                 
                 var countSpan = document.createElement('span');
                 countSpan.className = 'text-base font-bold text-blue-600';
@@ -285,7 +282,6 @@
                 var lineBreak = document.createElement('br');
                 summaryDiv.appendChild(lineBreak);
                 
-                summaryDiv.appendChild(labelSpan);
                 summaryDiv.appendChild(countSpan);
                 summaryDiv.appendChild(unitSpan);
                 
